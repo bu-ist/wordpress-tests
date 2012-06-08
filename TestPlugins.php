@@ -1,17 +1,9 @@
 <?php
 require_once 'PHPUnit/Autoload.php';
 
-$tests_dir = dirname( __FILE__ );
-$old_cwd = getcwd();
-chdir( $tests_dir );
+wp_test_load_plugin_tests();
 
-for( $depth = 0; $depth <= 3; $depth++ ) {
-	foreach( glob( str_repeat( 'tests[_-]*/', $depth ) . 'test_*.php' ) as $test_file ) {
-		include_once $test_file;
-	}	
-}
-
-class all {
+class TestPlugins {
     public static function suite() {
         $suite = new PHPUnit_Framework_TestSuite();
 		
@@ -23,5 +15,3 @@ class all {
         return $suite;
     }
 }
-
-chdir( $old_cwd );
