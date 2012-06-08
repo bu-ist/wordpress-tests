@@ -38,3 +38,5 @@ require_once ABSPATH . '/wp-settings.php';
 
 require WP_TESTS_PATH . '/lib/testcase.php';
 require WP_TESTS_PATH . '/lib/exceptions.php';
+
+wp_test_load_plugin_tests();
