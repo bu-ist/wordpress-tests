@@ -9,7 +9,8 @@ error_reporting( E_ALL & ~E_DEPRECATED & ~E_STRICT );
 $config_file_path = $argv[1];
 
 define( 'WP_INSTALLING', true );
-require_once $config_file_path;
+require_once $config_file_path . '/unittests-config.php';
+require_once $config_file_path . '/lib/functions.php';
 
 $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
 $_SERVER['HTTP_HOST'] = WP_TESTS_DOMAIN;
@@ -20,25 +21,15 @@ require_once ABSPATH . '/wp-settings.php';
 require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 require_once ABSPATH . '/wp-includes/wp-db.php';
 
-define( 'WP_TESTS_DB_VERSION_FILE', ABSPATH . '.wp-tests-db-version' );
-
 $wpdb->suppress_errors();
 $wpdb->hide_errors();
-$installed = $wpdb->get_var( "SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'" );
 
-if ( $installed && file_exists( WP_TESTS_DB_VERSION_FILE ) ) {
-	$install_db_version = file_get_contents( WP_TESTS_DB_VERSION_FILE );
-	$db_version = get_option( 'db_version' );
-	if ( $db_version == $install_db_version ) {
-		return;
-	}
-}
 $wpdb->query( 'SET storage_engine = INNODB;' );
 $wpdb->query( 'DROP DATABASE IF EXISTS '.DB_NAME.";" );
 $wpdb->query( 'CREATE DATABASE '.DB_NAME.";" );
 $wpdb->select( DB_NAME, $wpdb->dbh );
 
-echo "Installing…\n";
+echo "Installing WordPress...\n";
 wp_install( WP_TESTS_TITLE, 'admin', WP_TESTS_EMAIL, true, '', 'a' );
 
 if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
@@ -53,7 +44,14 @@ if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
 	$result = populate_network(1, WP_TESTS_DOMAIN, WP_TESTS_EMAIL, WP_TESTS_NETWORK_TITLE, ABSPATH, WP_TESTS_SUBDOMAIN_INSTALL);
 
 	system( 'php '.escapeshellarg( dirname( __FILE__ ) . '/ms-install.php' ) . ' ' . escapeshellarg( $config_file_path ) );
-
+	
+	if ( isset( $wp_test_ms_plugins ) && is_array( $wp_test_ms_plugins ) ) {
+		echo "Installing network plugins...\n";
+		wptest_install_plugins($wp_test_ms_plugins);
+	}
 }
 
-file_put_contents( WP_TESTS_DB_VERSION_FILE, get_option('db_version') );
+if ( isset( $wp_tests_plugins ) && is_array( $wp_tests_plugins ) ) {
+	echo "Installing site plugins...\n";
+	wptest_install_plugins($wp_tests_plugins);
+}

@@ -20,6 +20,21 @@ define( 'WP_TESTS_NETWORK_TITLE', 'Test Network' );
 define( 'WP_TESTS_SUBDOMAIN_INSTALL', true );
 $base = '/';
 
+define( 'WP_TESTS_STYLESHEET', '');
+define( 'WP_TESTS_TEMPLATE', '');
+
+
+// Plugins to activate on install. Plugins will be activated on all sites in a 
+// MultiSite install.
+$wp_tests_plugins  = array(
+	'hello.php',
+);
+
+// Plugins to network activate. 
+$wp_tests_ms_plugins = array(
+
+);
+
 /* Cron tries to make an HTTP request to the blog, which always fails, because tests are run in CLI mode only */
 define( 'DISABLE_WP_CRON', true );
 

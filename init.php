@@ -7,7 +7,11 @@ error_reporting( E_ALL & ~E_DEPRECATED & ~E_STRICT );
 
 require_once 'PHPUnit/Autoload.php';
 
-$config_file_path = dirname( __FILE__ ) . '/unittests-config.php';
+define('WP_TESTS_PATH', dirname( __FILE__ ) );
+
+require WP_TESTS_PATH . '/lib/functions.php';
+	
+$config_file_path = WP_TESTS_PATH . '/unittests-config.php';
 
 /*
  * Globalize some WordPress variables, because PHPUnit loads this file inside a function
@@ -26,33 +30,11 @@ $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
 $_SERVER['HTTP_HOST'] = WP_TESTS_DOMAIN;
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
 
-system( 'php '.escapeshellarg( dirname( __FILE__ ) . '/bin/install.php' ) . ' ' . escapeshellarg( $config_file_path ) );
-
-// Stop most of WordPress from being loaded.
-define('SHORTINIT', true);
+// install WordPress
+system( 'php '.escapeshellarg( WP_TESTS_PATH . '/bin/install.php' ) . ' ' . escapeshellarg( WP_TESTS_PATH ) );
 
 // Load the basics part of WordPress.
 require_once ABSPATH . '/wp-settings.php';
 
-// Preset WordPress options defined in bootstarp file.
-// Used to activate theme and plugins.
-if(isset($GLOBALS['wp_tests_options'])) {
-	function wp_tests_options( $value ) {
-		$key = substr( current_filter(), strlen( 'pre_option_' ) );
-		return $GLOBALS['wp_tests_options'][$key];
-	}
-
-	foreach ( array_keys( $GLOBALS['wp_tests_options'] ) as $key ) {
-		add_filter( 'pre_option_'.$key, 'wp_tests_options' );
-	}
-}
-
-// Load the rest of wp-settings.php, start from where we left off.
-$wp_settings_content = file_get_contents(ABSPATH.'/wp-settings.php');
-$shortinit_phrase = "if ( SHORTINIT )\n\treturn false;\n";
-$offset = strpos($wp_settings_content, $shortinit_phrase)+strlen($shortinit_phrase);
-eval(substr($wp_settings_content, $offset));
-unset($wp_settings_content, $offset, $shortinit_phrase);
-
-require dirname( __FILE__ ) . '/lib/testcase.php';
-require dirname( __FILE__ ) . '/lib/exceptions.php';
+require WP_TESTS_PATH . '/lib/testcase.php';
+require WP_TESTS_PATH . '/lib/exceptions.php';
