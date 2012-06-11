@@ -43,15 +43,23 @@ if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
 	install_network();
 	$result = populate_network(1, WP_TESTS_DOMAIN, WP_TESTS_EMAIL, WP_TESTS_NETWORK_TITLE, ABSPATH, WP_TESTS_SUBDOMAIN_INSTALL);
 
-	system( 'php '.escapeshellarg( dirname( __FILE__ ) . '/ms-install.php' ) . ' ' . escapeshellarg( $config_file_path ) );
+	system( 'php '.escapeshellarg( dirname( __FILE__ ) . '/ms-install.php' ) . ' ' . escapeshellarg( $config_file_path . '/unittests-config.php' ) );
 	
-	if ( isset( $wp_test_ms_plugins ) && is_array( $wp_test_ms_plugins ) ) {
+	if( isset( $wp_test_ms_plugins ) && is_array( $wp_test_ms_plugins ) ) {
 		echo "Installing network plugins...\n";
-		wptest_install_plugins($wp_test_ms_plugins);
+		wp_test_install_plugins($wp_test_ms_plugins);
 	}
+
+}
+if( isset( $wp_tests_plugins ) && is_array( $wp_tests_plugins ) ) {
+	echo "Installing site plugins...\n";
+	wp_test_install_plugins($wp_tests_plugins);
 }
 
-if ( isset( $wp_tests_plugins ) && is_array( $wp_tests_plugins ) ) {
-	echo "Installing site plugins...\n";
-	wptest_install_plugins($wp_tests_plugins);
-}
+if( ( defined('WP_TESTS_TEMPLATE') && (WP_TESTS_TEMPLATE != '' ) ) || ( defined( 'WP_TESTS_STYLESHEET' ) && WP_TESTS_STYLESHEET != '' ) ) {
+	if(WP_TESTS_TEMPLATE != WP_TESTS_STYLESHEET) {
+		switch_theme(WP_TESTS_TEMPLATE, WP_TESTS_STYLESHEET);
+	} else {
+		switch_theme(WP_TESTS_STYLESHEET, WP_TESTS_STYLESHEET);
+	}
+}	
