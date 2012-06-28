@@ -8,7 +8,8 @@ error_reporting( E_ALL & ~E_DEPRECATED & ~E_STRICT );
 
 $config_file_path = $argv[1];
 
-require_once $config_file_path;
+require_once $config_file_path . '/unittests-config.php';
+require_once $config_file_path . '/lib/functions.php';
 
 $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
 $_SERVER['HTTP_HOST'] = WP_TESTS_DOMAIN;
@@ -35,5 +36,10 @@ if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
 		}
 		wpmu_create_blog( $newdomain, $path, $blog, email_exists(WP_TESTS_EMAIL) , array( 'public' => 1 ), 1 );
 
+	}
+	
+	if( isset( $wp_tests_ms_plugins ) && is_array( $wp_tests_ms_plugins ) ) {
+		echo "Installing network plugins...\n";
+		wp_test_install_plugins($wp_tests_ms_plugins, true);
 	}
 }

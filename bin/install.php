@@ -43,14 +43,9 @@ if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
 	install_network();
 	$result = populate_network(1, WP_TESTS_DOMAIN, WP_TESTS_EMAIL, WP_TESTS_NETWORK_TITLE, '/', WP_TESTS_SUBDOMAIN_INSTALL);
 
-	system( 'php '.escapeshellarg( dirname( __FILE__ ) . '/ms-install.php' ) . ' ' . escapeshellarg( $config_file_path . '/unittests-config.php' ) );
-	
-	if( isset( $wp_test_ms_plugins ) && is_array( $wp_test_ms_plugins ) ) {
-		echo "Installing network plugins...\n";
-		wp_test_install_plugins($wp_test_ms_plugins);
-	}
-
+	system( 'php '.escapeshellarg( dirname( __FILE__ ) . '/ms-install.php' ) . ' ' . escapeshellarg( $config_file_path ) );
 }
+
 if( isset( $wp_tests_plugins ) && is_array( $wp_tests_plugins ) ) {
 	echo "Installing site plugins...\n";
 	wp_test_install_plugins($wp_tests_plugins);

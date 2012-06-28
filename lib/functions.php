@@ -5,9 +5,12 @@
  *
  * @param array $plugins Plugins to activate.
  **/
-function wp_test_install_plugins($plugins) {
+function wp_test_install_plugins($plugins, $network_wide = false) {
 	foreach($plugins as $plugin) {
-		activate_plugin($plugin);
+		$valid = activate_plugin($plugin, '', $network_wide);
+		if(is_wp_error($valid)) {
+			echo "Plugin $plugin could not be activated " . $valid->get_error_message() . "\n";
+		}
 	}
 }
 
