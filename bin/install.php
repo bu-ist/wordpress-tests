@@ -33,7 +33,7 @@ echo "Installing WordPress...\n";
 wp_install( WP_TESTS_TITLE, 'admin', WP_TESTS_EMAIL, true, '', 'a' );
 
 if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
-	echo "Installing network…\n";
+	echo "Installing network...\n";
 
 	define( 'WP_INSTALLING_NETWORK', true );
 	//wp_set_wpdb_vars();
@@ -44,7 +44,7 @@ if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
 	$result = populate_network(1, WP_TESTS_DOMAIN, WP_TESTS_EMAIL, WP_TESTS_NETWORK_TITLE, '/', WP_TESTS_SUBDOMAIN_INSTALL);
 
 	system( 'php '.escapeshellarg( dirname( __FILE__ ) . '/ms-install.php' ) . ' ' . escapeshellarg( $config_file_path ) );
-}
+} 
 
 if( isset( $wp_tests_plugins ) && is_array( $wp_tests_plugins ) ) {
 	echo "Installing site plugins...\n";
@@ -57,4 +57,5 @@ if( ( defined('WP_TESTS_TEMPLATE') && (WP_TESTS_TEMPLATE != '' ) ) || ( defined(
 	} else {
 		switch_theme(WP_TESTS_STYLESHEET, WP_TESTS_STYLESHEET);
 	}
-}	
+}
+

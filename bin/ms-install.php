@@ -21,8 +21,7 @@ require_once ABSPATH . '/wp-settings.php';
 require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 require_once ABSPATH . '/wp-includes/wp-db.php';
 
-echo "Installing sites…\n";
-wp_install( WP_TESTS_TITLE, 'admin', WP_TESTS_EMAIL, true, '', 'a' );
+echo "Installing sites...\n";
 
 if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
 	$blogs = explode(',', WP_TESTS_BLOGS);
@@ -34,8 +33,25 @@ if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE ) {
 			$newdomain = WP_TESTS_DOMAIN;
 			$path = $base.$blog.'/';
 		}
-		wpmu_create_blog( $newdomain, $path, $blog, email_exists(WP_TESTS_EMAIL) , array( 'public' => 1 ), 1 );
+		$blog_created = wpmu_create_blog( $newdomain, $path, $blog, email_exists(WP_TESTS_EMAIL) , array( 'public' => 1 ), 1 );
+		if( is_wp_error( $blog_created ) ) {
+			echo "Blog could not be created." . $blog_created->get_error_message() . "\n";
+		} else {
+			switch_to_blog($blog_created);	
+			if( isset( $wp_tests_plugins ) && is_array( $wp_tests_plugins ) ) {
+				echo "Installing site plugins for blog_id: $blog_created...\n";
+				wp_test_install_plugins($wp_tests_plugins);
+			}
 
+			if( ( defined('WP_TESTS_TEMPLATE') && (WP_TESTS_TEMPLATE != '' ) ) || ( defined( 'WP_TESTS_STYLESHEET' ) && WP_TESTS_STYLESHEET != '' ) ) {
+				if(WP_TESTS_TEMPLATE != WP_TESTS_STYLESHEET) {
+					switch_theme(WP_TESTS_TEMPLATE, WP_TESTS_STYLESHEET);
+				} else {
+					switch_theme(WP_TESTS_STYLESHEET, WP_TESTS_STYLESHEET);
+				}
+			}
+			restore_current_blog();
+		}	
 	}
 	
 	if( isset( $wp_tests_ms_plugins ) && is_array( $wp_tests_ms_plugins ) ) {
